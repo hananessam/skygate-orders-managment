@@ -3,7 +3,17 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client"
-  output = "../src/generated/prisma"
-  moduleFormat = "cjs"
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  name         String?
+  password     String
+  refreshToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
 }
