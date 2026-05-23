@@ -18,12 +18,13 @@ export function buildOpenApiDocument(app: INestApplication): OpenAPIObject {
   const version = configService.get<string>('OPENAPI_VERSION', DEFAULT_OPENAPI_VERSION);
   const port = configService.get<number>('PORT', 3000);
   const serverUrl = configService.get<string>('OPENAPI_SERVER_URL', `http://localhost:${port}`);
+  const normalizedServerUrl = serverUrl.replace(/\/+$/, '');
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle(title)
     .setDescription(description)
     .setVersion(version)
-    .addServer(serverUrl, 'Default server')
+    .addServer(normalizedServerUrl, 'Default server')
     .addBearerAuth(
       {
         type: 'http',

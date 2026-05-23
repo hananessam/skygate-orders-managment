@@ -18,6 +18,7 @@ async function bootstrap() {
 
   app.use(helmet());
   app.enableCors(corsOptions);
+  app.setGlobalPrefix('api');
   setupOpenApi(app);
   app.useGlobalPipes(
     new ValidationPipe({

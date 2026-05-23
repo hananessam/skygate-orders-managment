@@ -6,6 +6,7 @@ import { buildOpenApiDocument } from '../config/openapi.config';
 
 async function generateOpenApiSpec(): Promise<void> {
   const app = await NestFactory.create(AppModule, { logger: false });
+  app.setGlobalPrefix('api');
 
   try {
     const document = buildOpenApiDocument(app);
