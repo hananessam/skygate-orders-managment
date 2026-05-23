@@ -2,6 +2,17 @@
 
 NestJS + Prisma + PostgreSQL backend with JWT authentication and OpenAPI documentation.
 
+## Implemented API Scope
+
+- Health endpoint (`GET /`)
+- Auth endpoint: `POST /auth/register`
+- Auth endpoint: `POST /auth/login`
+- Auth endpoint: `POST /auth/refresh`
+- Auth endpoint: `POST /auth/logout`
+- Auth endpoint: `GET /auth/me`
+- Product endpoint (public read-only): `GET /products`
+- Product endpoint (public read-only): `GET /products/:id`
+
 ## Prerequisites
 
 - Node.js 20+
@@ -110,4 +121,5 @@ npm run db:seed
 ## Notes
 
 - Default seed creates or updates `admin@example.com`.
+- Default seed also creates or updates sample products by SKU.
 - For production, replace JWT secrets and database credentials with secure values.
