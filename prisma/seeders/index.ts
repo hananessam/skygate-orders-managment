@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../src/generated/prisma/client';
 import { seedUsers } from './user.seeder';
 
 type Seeder = (prisma: PrismaClient) => Promise<void>;

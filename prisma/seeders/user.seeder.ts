@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../src/generated/prisma/client';
 
 const BCRYPT_ROUNDS = 12;
 const DEFAULT_ADMIN_EMAIL = 'admin@example.com';
