@@ -17,6 +17,18 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    container_name: skygate-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   api:
     build:
       context: .
@@ -26,11 +38,15 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     env_file:
       - .env
     environment:
       PORT: 3000
       DATABASE_URL: postgresql://postgres:postgres@db:5432/skygate_orders?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
       OPENAPI_SERVER_URL: http://localhost:3000
     ports:
       - '3000:3000'
