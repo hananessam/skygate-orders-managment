@@ -14,6 +14,8 @@ import { AppService } from './app.service';
           .valid('development', 'test', 'production')
           .default('development'),
         PORT: Joi.number().port().default(3000),
+        CORS_ORIGIN: Joi.string().optional(),
+        CORS_CREDENTIALS: Joi.boolean().default(false),
       }),
     }),
   ],
