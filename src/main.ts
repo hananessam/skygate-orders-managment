@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
+import { setupOpenApi } from './config/openapi.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,6 +18,7 @@ async function bootstrap() {
 
   app.use(helmet());
   app.enableCors(corsOptions);
+  setupOpenApi(app);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
