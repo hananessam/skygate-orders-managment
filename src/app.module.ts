@@ -27,6 +27,7 @@ import { UserModule } from './user/user.module';
         JWT_REFRESH_SECRET: Joi.string().required(),
         JWT_ACCESS_EXPIRES_IN: Joi.string().default('15m'),
         JWT_REFRESH_EXPIRES_IN: Joi.string().default('7d'),
+        OPENAPI_SERVER_URL: Joi.string().uri().optional(),
       }),
     }),
     PrismaModule,
