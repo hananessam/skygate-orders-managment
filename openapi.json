@@ -24,6 +24,67 @@
         ]
       }
     },
+    "/products": {
+      "get": {
+        "operationId": "ProductController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Products retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get all available products",
+        "tags": [
+          "Products"
+        ]
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "operationId": "ProductController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Product UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found"
+          }
+        },
+        "summary": "Get a product by id",
+        "tags": [
+          "Products"
+        ]
+      }
+    },
     "/auth/register": {
       "post": {
         "operationId": "AuthController_register",
@@ -197,6 +258,50 @@
       }
     },
     "schemas": {
+      "ProductResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "4e5c8892-00e0-462c-9e96-d467f7f590a4"
+          },
+          "sku": {
+            "type": "string",
+            "example": "SKU1001"
+          },
+          "name": {
+            "type": "string",
+            "example": "Noise Cancelling Headphones"
+          },
+          "price": {
+            "type": "number",
+            "example": 199.99
+          },
+          "stockQuantity": {
+            "type": "number",
+            "example": 25
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-05-23T12:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-05-23T12:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "sku",
+          "name",
+          "price",
+          "stockQuantity",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
       "RegisterDto": {
         "type": "object",
         "properties": {

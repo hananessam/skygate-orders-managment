@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import corsConfig from './config/cors.config';
 import jwtConfig from './config/jwt.config';
 import { PrismaModule } from './prisma/prisma.module';
+import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
 
 @Module({
@@ -32,6 +33,7 @@ import { UserModule } from './user/user.module';
     }),
     PrismaModule,
     UserModule,
+    ProductModule,
     AuthModule,
   ],
   controllers: [AppController],

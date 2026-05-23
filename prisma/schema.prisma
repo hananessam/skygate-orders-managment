@@ -19,3 +19,16 @@ model User {
 
   @@map("users")
 }
+
+model Product {
+  id            String   @id @default(uuid())
+  sku           String   @unique @db.VarChar(64)
+  name          String   @db.VarChar(200)
+  price         Decimal  @db.Decimal(12, 2)
+  stockQuantity Int
+  isDeleted     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("products")
+}
