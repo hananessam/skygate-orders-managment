@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -144,7 +145,7 @@ export class OrderService {
       }
 
       if (product.stockQuantity < item.quantity) {
-        throw new BadRequestException(
+        throw new ConflictException(
           `Insufficient stock for product ${item.productId}`,
         );
       }
