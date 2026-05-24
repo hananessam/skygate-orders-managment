@@ -5,12 +5,14 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiHeader,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -26,6 +28,7 @@ import {
   OrderResponseDto,
   PaginatedOrdersResponseDto,
 } from './dto/order-response.dto';
+import { IdempotencyInterceptor } from './interceptors/idempotency.interceptor';
 import { OrderService } from './order.service';
 
 @ApiTags('Orders')
@@ -46,7 +49,15 @@ export class OrderController {
   @ApiConflictResponse({
     description: 'Concurrent stock update conflict, please retry',
   })
+  @ApiHeader({
+    name: 'Idempotency-Key',
+    required: false,
+    description:
+      'Unique client-generated UUID used to prevent duplicate order creation on retries',
+    schema: { type: 'string', format: 'uuid' },
+  })
   @Post()
+  @UseInterceptors(IdempotencyInterceptor)
   create(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CreateOrderDto,

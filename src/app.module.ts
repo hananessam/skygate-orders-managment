@@ -6,6 +6,7 @@ import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { RedisModule } from './common/redis/redis.module';
 import corsConfig from './config/cors.config';
 import jwtConfig from './config/jwt.config';
 import { OrderModule } from './order/order.module';
@@ -51,6 +52,7 @@ import { UserModule } from './user/user.module';
       }),
     }),
     EventEmitterModule.forRoot(),
+    RedisModule,
     PrismaModule,
     UserModule,
     ProductModule,
