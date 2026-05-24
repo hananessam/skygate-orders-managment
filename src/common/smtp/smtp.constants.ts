@@ -1,0 +1,2 @@
+export const SMTP_TRANSPORTER = 'SMTP_TRANSPORTER';
+export const SMTP_FROM = 'SMTP_FROM';

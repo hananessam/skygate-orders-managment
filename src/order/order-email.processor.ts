@@ -3,12 +3,10 @@ import {
   Processor,
   WorkerHost,
 } from '@nestjs/bullmq';
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import type { ConfigType } from '@nestjs/config';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { Job } from 'bullmq';
-import nodemailer, { type Transporter } from 'nodemailer';
-import smtpConfig from '../config/smtp.config';
+import type { Transporter } from 'nodemailer';
+import { SMTP_FROM, SMTP_TRANSPORTER } from '../common/smtp/smtp.constants';
 import { UserService } from '../user/user.service';
 import {
   SEND_ORDER_CONFIRMATION_EMAIL_JOB,
@@ -19,55 +17,15 @@ import {
 @Processor('orders')
 export class OrderEmailProcessor extends WorkerHost {
   private readonly logger = new Logger(OrderEmailProcessor.name);
-  private readonly transporter: Transporter;
-  private readonly smtpFrom: string;
 
   constructor(
-    private readonly configService: ConfigService,
     private readonly userService: UserService,
+    @Inject(SMTP_TRANSPORTER)
+    private readonly transporter: Transporter,
+    @Inject(SMTP_FROM)
+    private readonly smtpFrom: string,
   ) {
     super();
-
-    this.smtpFrom = this.getSmtpFrom();
-    this.transporter = this.createSmtpTransporter();
-  }
-
-  /**
-   * Retrieves validated SMTP configuration from the app config namespace.
-   */
-  private getSmtpConfig(): ConfigType<typeof smtpConfig> {
-    const smtp = this.configService.get<ConfigType<typeof smtpConfig>>('smtp');
-
-    return {
-      host: smtp?.host ?? '127.0.0.1',
-      port: smtp?.port ?? 1025,
-      user: smtp?.user ?? '',
-      pass: smtp?.pass ?? '',
-      from: smtp?.from ?? 'SkyGate Orders <no-reply@skygate.local>',
-    };
-  }
-
-  /**
-   * Retrieves the SMTP "from" address from config.
-   * @returns {string} The SMTP "from" address.
-   */
-  private getSmtpFrom(): string {
-    return this.getSmtpConfig().from;
-  }
-
-  /**
-   * Creates a nodemailer transporter using SMTP configuration.
-   * @returns {Transporter} The nodemailer transporter instance.
-   */
-  private createSmtpTransporter(): Transporter {
-    const smtp = this.getSmtpConfig();
-
-    return nodemailer.createTransport({
-      host: smtp.host,
-      port: smtp.port,
-      secure: false,
-      auth: smtp.user && smtp.pass ? { user: smtp.user, pass: smtp.pass } : undefined,
-    });
   }
 
   async process(job: Job<SendOrderConfirmationEmailJobData>): Promise<void> {

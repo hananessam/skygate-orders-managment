@@ -7,6 +7,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { RedisModule } from './common/redis/redis.module';
+import { SmtpModule } from './common/smtp/smtp.module';
 import { appConfigLoaders } from './config/loaders.config';
 import { envValidationSchema } from './config/env.validation';
 import redisConfig from './config/redis.config';
@@ -38,6 +39,7 @@ import { UserModule } from './user/user.module';
     }),
     EventEmitterModule.forRoot(),
     RedisModule,
+    SmtpModule,
     PrismaModule,
     UserModule,
     ProductModule,
