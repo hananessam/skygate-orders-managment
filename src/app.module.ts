@@ -1,5 +1,7 @@
+import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -29,9 +31,21 @@ import { UserModule } from './user/user.module';
         JWT_REFRESH_SECRET: Joi.string().required(),
         JWT_ACCESS_EXPIRES_IN: Joi.string().default('15m'),
         JWT_REFRESH_EXPIRES_IN: Joi.string().default('7d'),
+        REDIS_HOST: Joi.string().default('127.0.0.1'),
+        REDIS_PORT: Joi.number().port().default(6379),
         OPENAPI_SERVER_URL: Joi.string().uri().optional(),
       }),
     }),
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        connection: {
+          host: configService.get<string>('REDIS_HOST', '127.0.0.1'),
+          port: configService.get<number>('REDIS_PORT', 6379),
+        },
+      }),
+    }),
+    EventEmitterModule.forRoot(),
     PrismaModule,
     UserModule,
     ProductModule,

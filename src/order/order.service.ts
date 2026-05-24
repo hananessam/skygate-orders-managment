@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Prisma } from '../generated/prisma/client';
 import type { CreateOrderDto } from './dto/create-order.dto';
 import type { ListOrdersQueryDto } from './dto/list-orders-query.dto';
@@ -10,6 +11,7 @@ import type {
   OrderResponseDto,
   PaginatedOrdersResponseDto,
 } from './dto/order-response.dto';
+import { OrderPlacedEvent } from './events/order-placed.event';
 import {
   OrderRepository,
   type OrderRow,
@@ -19,6 +21,7 @@ import {
 export class OrderService {
   constructor(
     private readonly orderRepository: OrderRepository,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   /**
@@ -33,6 +36,11 @@ export class OrderService {
   ): Promise<OrderResponseDto> {
     const order = await this.orderRepository.withTransaction((tx) =>
       this.createOrderInTransaction(tx, userId, dto.items),
+    );
+
+    this.eventEmitter.emit(
+      OrderPlacedEvent.eventName,
+      new OrderPlacedEvent(order.id, userId),
     );
 
     return this.toResponse(order);
