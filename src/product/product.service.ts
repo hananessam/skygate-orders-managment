@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import type { ProductResponseDto } from './dto/product-response.dto';
+import type { UpdateProductDto } from './dto/update-product.dto';
 
 const productResponseSelect = {
   id: true,
@@ -43,6 +44,58 @@ export class ProductService {
     }
 
     return this.toResponse(product);
+  }
+
+  async update(id: string, dto: UpdateProductDto): Promise<ProductResponseDto> {
+    const existingProduct = await this.prisma.product.findFirst({
+      where: {
+        id,
+        isDeleted: false,
+      },
+      select: { id: true },
+    });
+
+    if (!existingProduct) {
+      throw new NotFoundException('Product not found');
+    }
+
+    const updateData: Prisma.ProductUpdateInput = {};
+    if (typeof dto.price === 'number') {
+      updateData.price = new Prisma.Decimal(dto.price);
+    }
+
+    if (typeof dto.stockQuantity === 'number') {
+      updateData.stockQuantity = dto.stockQuantity;
+    }
+
+    const product = await this.prisma.product.update({
+      where: { id },
+      data: updateData,
+      select: productResponseSelect,
+    });
+
+    return this.toResponse(product);
+  }
+
+  async softDelete(id: string): Promise<void> {
+    const existingProduct = await this.prisma.product.findFirst({
+      where: {
+        id,
+        isDeleted: false,
+      },
+      select: { id: true },
+    });
+
+    if (!existingProduct) {
+      throw new NotFoundException('Product not found');
+    }
+
+    await this.prisma.product.update({
+      where: { id },
+      data: {
+        isDeleted: true,
+      },
+    });
   }
 
   private toResponse(product: ProductReadModel): ProductResponseDto {
