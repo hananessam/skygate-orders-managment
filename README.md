@@ -5,13 +5,15 @@ NestJS + Prisma + PostgreSQL backend with JWT authentication and OpenAPI documen
 ## Implemented API Scope
 
 - Health endpoint (`GET /`)
-- Auth endpoint: `POST /auth/register`
-- Auth endpoint: `POST /auth/login`
-- Auth endpoint: `POST /auth/refresh`
-- Auth endpoint: `POST /auth/logout`
-- Auth endpoint: `GET /auth/me`
-- Product endpoint (public read-only): `GET /products`
-- Product endpoint (public read-only): `GET /products/:id`
+- Auth endpoint: `POST /api/auth/register`
+- Auth endpoint: `POST /api/auth/login`
+- Auth endpoint: `POST /api/auth/refresh`
+- Auth endpoint: `POST /api/auth/logout`
+- Auth endpoint: `GET /api/auth/me`
+- Product endpoint (public read-only): `GET /api/products`
+- Product endpoint (public read-only): `GET /api/products/:id`
+- Order endpoint (authenticated): `POST /api/orders`
+- Order endpoint (authenticated): `GET /api/orders`
 
 ## Prerequisites
 
@@ -33,6 +35,8 @@ Important vars:
 - `DATABASE_URL`
 - `JWT_ACCESS_SECRET`
 - `JWT_REFRESH_SECRET`
+- `REDIS_HOST`
+- `REDIS_PORT`
 - `OPENAPI_SERVER_URL`
 
 ## Run Locally (without Docker)
@@ -41,6 +45,7 @@ Important vars:
 npm install
 npx prisma migrate dev
 npm run db:seed
+redis-server
 npm run start:dev
 ```
 
@@ -77,7 +82,8 @@ Service URLs:
 
 - API: `http://localhost:3000`
 - Docs: `http://localhost:3000/docs`
-- Postgres: `localhost:5432`
+- Postgres: `localhost:5433`
+- Redis: `localhost:6379`
 
 ### View logs
 
