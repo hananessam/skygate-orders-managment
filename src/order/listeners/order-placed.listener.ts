@@ -22,6 +22,13 @@ export class OrderPlacedListener {
           orderId: event.orderId,
           userId: event.userId,
         },
+        {
+            attempts: 5,
+            backoff: {
+                type: 'exponential',
+                delay: 1000,
+            },
+        },
       );
     } catch (error) {
       this.logger.error(
