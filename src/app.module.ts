@@ -1,14 +1,15 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import type { ConfigType } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import * as Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { RedisModule } from './common/redis/redis.module';
-import corsConfig from './config/cors.config';
-import jwtConfig from './config/jwt.config';
+import { appConfigLoaders } from './config/loaders.config';
+import { envValidationSchema } from './config/env.validation';
+import redisConfig from './config/redis.config';
 import { OrderModule } from './order/order.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductModule } from './product/product.module';
@@ -19,37 +20,21 @@ import { UserModule } from './user/user.module';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
-      load: [corsConfig, jwtConfig],
-      validationSchema: Joi.object({
-        NODE_ENV: Joi.string()
-          .valid('development', 'test', 'production')
-          .default('development'),
-        PORT: Joi.number().port().default(3000),
-        CORS_ORIGIN: Joi.string().optional(),
-        CORS_CREDENTIALS: Joi.boolean().default(false),
-        DATABASE_URL: Joi.string().required(),
-        JWT_ACCESS_SECRET: Joi.string().required(),
-        JWT_REFRESH_SECRET: Joi.string().required(),
-        JWT_ACCESS_EXPIRES_IN: Joi.string().default('15m'),
-        JWT_REFRESH_EXPIRES_IN: Joi.string().default('7d'),
-        REDIS_HOST: Joi.string().default('127.0.0.1'),
-        REDIS_PORT: Joi.number().port().default(6379),
-        SMTP_HOST: Joi.string().default('127.0.0.1'),
-        SMTP_PORT: Joi.number().port().default(1025),
-        SMTP_USER: Joi.string().allow('').optional(),
-        SMTP_PASS: Joi.string().allow('').optional(),
-        SMTP_FROM: Joi.string().default('SkyGate Orders <no-reply@skygate.local>'),
-        OPENAPI_SERVER_URL: Joi.string().uri().optional(),
-      }),
+      load: appConfigLoaders,
+      validationSchema: envValidationSchema,
     }),
     BullModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        connection: {
-          host: configService.get<string>('REDIS_HOST', '127.0.0.1'),
-          port: configService.get<number>('REDIS_PORT', 6379),
-        },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const redis = configService.get<ConfigType<typeof redisConfig>>('redis');
+
+        return {
+          connection: {
+            host: redis?.host ?? '127.0.0.1',
+            port: redis?.port ?? 6379,
+          },
+        };
+      },
     }),
     EventEmitterModule.forRoot(),
     RedisModule,

@@ -5,8 +5,10 @@ import {
 } from '@nestjs/bullmq';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import type { ConfigType } from '@nestjs/config';
 import type { Job } from 'bullmq';
 import nodemailer, { type Transporter } from 'nodemailer';
+import smtpConfig from '../config/smtp.config';
 import { UserService } from '../user/user.service';
 import {
   SEND_ORDER_CONFIRMATION_EMAIL_JOB,
@@ -31,31 +33,40 @@ export class OrderEmailProcessor extends WorkerHost {
   }
 
   /**
-   * Retrieves the SMTP "from" address from environment variables.
-   * @returns {string} The SMTP "from" address.
+   * Retrieves validated SMTP configuration from the app config namespace.
    */
-  private getSmtpFrom(): string {
-    return this.configService.get<string>(
-      'SMTP_FROM',
-      'SkyGate Orders <no-reply@skygate.local>',
-    );
+  private getSmtpConfig(): ConfigType<typeof smtpConfig> {
+    const smtp = this.configService.get<ConfigType<typeof smtpConfig>>('smtp');
+
+    return {
+      host: smtp?.host ?? '127.0.0.1',
+      port: smtp?.port ?? 1025,
+      user: smtp?.user ?? '',
+      pass: smtp?.pass ?? '',
+      from: smtp?.from ?? 'SkyGate Orders <no-reply@skygate.local>',
+    };
   }
 
   /**
-   * Creates a nodemailer transporter using SMTP configuration from environment variables.
+   * Retrieves the SMTP "from" address from config.
+   * @returns {string} The SMTP "from" address.
+   */
+  private getSmtpFrom(): string {
+    return this.getSmtpConfig().from;
+  }
+
+  /**
+   * Creates a nodemailer transporter using SMTP configuration.
    * @returns {Transporter} The nodemailer transporter instance.
    */
   private createSmtpTransporter(): Transporter {
-    const smtpHost = this.configService.get<string>('SMTP_HOST', '127.0.0.1');
-    const smtpPort = this.configService.get<number>('SMTP_PORT', 1025);
-    const smtpUser = this.configService.get<string>('SMTP_USER', '');
-    const smtpPass = this.configService.get<string>('SMTP_PASS', '');
+    const smtp = this.getSmtpConfig();
 
     return nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
+      host: smtp.host,
+      port: smtp.port,
       secure: false,
-      auth: smtpUser && smtpPass ? { user: smtpUser, pass: smtpPass } : undefined,
+      auth: smtp.user && smtp.pass ? { user: smtp.user, pass: smtp.pass } : undefined,
     });
   }
 
