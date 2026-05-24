@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import corsConfig from './config/cors.config';
 import jwtConfig from './config/jwt.config';
+import { OrderModule } from './order/order.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
@@ -34,6 +35,7 @@ import { UserModule } from './user/user.module';
     PrismaModule,
     UserModule,
     ProductModule,
+    OrderModule,
     AuthModule,
   ],
   controllers: [AppController],
