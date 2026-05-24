@@ -3,6 +3,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import type { Queue } from 'bullmq';
 import { OrderPlacedEvent } from '../events/order-placed.event';
+import {
+  SEND_ORDER_CONFIRMATION_EMAIL_JOB,
+} from '../jobs/send-order-confirmation-email.job';
 
 @Injectable()
 export class OrderPlacedListener {
@@ -14,15 +17,15 @@ export class OrderPlacedListener {
   async handle(event: OrderPlacedEvent): Promise<void> {
     try {
       await this.ordersQueue.add(
-        'send-order-confirmation-email',
+        SEND_ORDER_CONFIRMATION_EMAIL_JOB,
         {
           orderId: event.orderId,
           userId: event.userId,
-        }
+        },
       );
     } catch (error) {
       this.logger.error(
-        `Failed to enqueue send-order-confirmation-email job for order ${event.orderId}`,
+        `Failed to enqueue confirmation email job for order ${event.orderId}`,
         error instanceof Error ? error.stack : undefined,
       );
     }
