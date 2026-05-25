@@ -83,12 +83,113 @@
         "tags": [
           "Products"
         ]
+      },
+      "put": {
+        "operationId": "ProductController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Product UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "At least one updatable field is required or values are invalid"
+          },
+          "401": {
+            "description": "Invalid or missing access token"
+          },
+          "404": {
+            "description": "Product not found"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Update product",
+        "tags": [
+          "Products"
+        ]
+      },
+      "delete": {
+        "operationId": "ProductController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Product UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Product soft deleted successfully"
+          },
+          "401": {
+            "description": "Invalid or missing access token"
+          },
+          "404": {
+            "description": "Product not found"
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Soft delete a product",
+        "tags": [
+          "Products"
+        ]
       }
     },
     "/api/orders": {
       "post": {
         "operationId": "OrderController_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Unique client-generated UUID used to prevent duplicate order creation on retries",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -121,6 +222,9 @@
           },
           "409": {
             "description": "Concurrent stock update conflict, please retry"
+          },
+          "429": {
+            "description": "Too many requests"
           }
         },
         "security": [
@@ -437,6 +541,21 @@
           "price",
           "stockQuantity"
         ]
+      },
+      "UpdateProductDto": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "number",
+            "example": 249.99,
+            "description": "Updated product price. Must be greater than 0"
+          },
+          "stockQuantity": {
+            "type": "number",
+            "example": 50,
+            "description": "Updated stock quantity. Must be greater than or equal to 0"
+          }
+        }
       },
       "OrderItemInputDto": {
         "type": "object",
