@@ -17,8 +17,10 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiTooManyRequestsResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
@@ -49,6 +51,7 @@ export class OrderController {
   @ApiConflictResponse({
     description: 'Concurrent stock update conflict, please retry',
   })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
   @ApiHeader({
     name: 'Idempotency-Key',
     required: false,
@@ -57,6 +60,8 @@ export class OrderController {
     schema: { type: 'string', format: 'uuid' },
   })
   @Post()
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ medium: { limit: 20, ttl: 10000 } })
   @UseInterceptors(IdempotencyInterceptor)
   create(
     @CurrentUser() user: AuthenticatedUser,

@@ -15,6 +15,7 @@ import { OrderModule } from './order/order.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -24,6 +25,13 @@ import { UserModule } from './user/user.module';
       load: appConfigLoaders,
       validationSchema: envValidationSchema,
     }),
+    ThrottlerModule.forRoot([
+      {
+        name: 'medium',
+        ttl: 10000,
+        limit: 20,
+      },
+    ]),
     BullModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
